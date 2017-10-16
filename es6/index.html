@@ -6,9 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <!-- <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script> -->
 </head>
 
 <body>
+    <div class="container">
+        dfjsadlkjfkl
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
     <script>
         'use strict';
 
@@ -120,9 +126,56 @@
 
             return Ajax;
         })();
-        Ajax.get('https://api.douban.com/v2/movie/subject/1764796')
-        .then(function(data){
-            console.log(data);
+        /*
+            同源策略：
+                何为同源
+                    1.相同的主机名、协议名、端口号才算是真正的同源
+
+                        https://www.baicu.com/index.php:80
+
+        */
+        // Ajax.get('https://api.douban.com/v2/movie/subject/1764796')
+        // .then(function(data){
+        //     console.log(data);
+        // })
+        // var url = 'https://api.douban.com/v2/movie/subject/1764796';
+        // var script = document.createElement('script');
+        // script.src = url + '?callback=jsonp';
+        // document.head.appendChild(script);
+
+        // function jsonp1(data) { //必须是一个全局函数
+        //     console.log(data);
+        // }
+
+        /*
+            解决跨域的方法  jsonp  面试必问
+            1.script标签不受同源策略影响
+            2.实现跨域，必须和后台商量好回调函数的名字
+        */
+        function jsonp(url, fn) {
+
+            var script = document.createElement('script');
+            var time = Date.now();
+            var fnName = 'jsonp' + time;
+            script.src = url + '?callback=' + fnName;
+            document.head.appendChild(script);
+            window['jsonCallBack_seckill_tpl'] = function (data) {
+                fn(data);
+                window['jsonCallBack_seckill_tpl'] = null;
+            }
+
+        }
+        // jsonp('https://misc.360buyimg.com/mtd/pc/index/2.0.0/home/seckill_tpl.min.js',function(data){
+        //     console.log(data);
+        // })
+        $.ajax({
+            url:'https://misc.360buyimg.com/mtd/pc/index/2.0.0/home/seckill_tpl.min.js',
+            dataType:'jsonp', //定义返回的数据是jsonp
+            jsonp:'callbackfsdafsadf',  //定义jsonp的变量名
+            jsonpCallback:'jsonCallBack_seckill_tpl',//定义jsonp的回调函数名
+            success:function(data){
+                console.log(data);
+            }
         })
     </script>
 </body>
