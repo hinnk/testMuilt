@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        'use strict';
+
+        var _createClass = (function () {
+            function defineProperties(target, props) {
+                for (var i = 0; i < props.length; i++) {
+                    var descriptor = props[i];
+                    descriptor.enumerable = descriptor.enumerable || false;
+                    descriptor.configurable = true;
+                    if ('value' in descriptor) descriptor.writable = true;
+                    Object.defineProperty(target, descriptor.key, descriptor);
+                }
+            }
+            return function (Constructor, protoProps, staticProps) {
+                if (protoProps) defineProperties(Constructor.prototype, protoProps);
+                if (staticProps) defineProperties(Constructor, staticProps);
+                return Constructor;
+            };
+        })();
+
+        function _classCallCheck(instance, Constructor) {
+            if (!(instance instanceof Constructor)) {
+                throw new TypeError('Cannot call a class as a function');
+            }
+        }
+
+        var Ajax = (function () {
+            function Ajax(url, _ref) {
+                var _ref$method = _ref.method;
+                var method = _ref$method === undefined ? 'get' : _ref$method;
+                var data = _ref.data;
+                var success = _ref.success;
+                var error = _ref.error;
+
+                _classCallCheck(this, Ajax);
+
+                this.url = url;
+                this.method = method;
+                this.data = data;
+                this.success = success;
+                this.error = error;
+                this.init();
+            }
+
+            _createClass(Ajax, [{
+                key: 'init',
+                value: function init() {
+                    var _this = this;
+
+                    var xhr = new XMLHttpRequest();
+                    if (this.method === 'get') {
+                        this.url += this.url.indexOf('?') ? '?' + this.dataToString() : this.dataToString();
+                        xhr.open(this.method, this.url);
+                        xhr.send();
+                    } else if (this.method === 'post') {
+                        xhr.open(this.method, this.url);
+                        xhr.send(this.data);
+                    }
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            _this.success(xhr.responseText);
+                        } else {
+                            _this.error(xhr);
+                        }
+                    };
+                }
+            }, {
+                key: 'dataToString',
+                value: function dataToString() {
+                    var result = '';
+                    for (var key in this.data) {
+                        result += key + '=' + this.data[key] + '&';
+                    }
+                    return result.substring(0, result.length - 1);
+                }
+            }], [{
+                key: 'get',
+                value: function get(url, data) {
+                    // es6默认支持Promise 
+                    return new Promise(function (resolve, reject) {
+                        new Ajax(url, {
+                            data: data,
+                            success: function success(data) {
+                                resolve(data);
+                            },
+                            error: function error(xhr) {
+                                reject(xhr);
+                            }
+                        });
+                    });
+                }
+            }, {
+                key: 'post',
+                value: function post(url, data) {
+                    return new Promise(function (resolve, reject) {
+                        new Ajax(url, {
+                            data: data,
+                            method: 'post',
+                            success: function success(data) {
+                                resolve(data);
+                            },
+                            error: function error(xhr) {
+                                reject(xhr);
+                            }
+                        });
+                    });
+                }
+            }]);
+
+            return Ajax;
+        })();
+        Ajax.get('https://api.douban.com/v2/movie/subject/1764796')
+        .then(function(data){
+            console.log(data);
+        })
+    </script>
+</body>
+
+</html>
